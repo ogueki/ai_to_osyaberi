@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI旅のおともプロトタイプ</title>
+  <style>
+    video {
+      width: 100%;
+      border-radius: 12px;
+    }
+    button {
+      padding: 10px 20px;
+      margin-right: 10px;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .start-btn { background-color: #3b82f6; }
+    .send-btn { background-color: #10b981; }
+  </style>
+</head>
+<body>
+  <h1>AI旅のおともプロトタイプ（Vanilla JS版）</h1>
+  <video id="video" autoplay playsinline></video>
+  <canvas id="canvas" style="display: none;"></canvas>
+  <div>
+    <button class="start-btn" onclick="startCamera()">カメラ開始</button>
+    <button class="send-btn" onclick="captureAndSendToAI()">景色を送る</button>
+  </div>
+  <p id="response"></p>
+
+  <script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const responseElem = document.getElementById('response');
+
+    async function startCamera() {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      video.srcObject = stream;
+    }
+
+    async function captureAndSendToAI() {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      const imageBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg'));
+      const base64Image = await blobToBase64(imageBlob);
+
+      // 仮のAI応答（ここにAPI連携予定）
+      const response = "わぁ、素敵な景色ですね〜♪";
+      responseElem.textContent = `AIの返答：${response}`;
+      speak(response);
+    }
+
+    function blobToBase64(blob) {
+      return new Promise(resolve => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.readAsDataURL(blob);
+      });
+    }
+
+    function speak(text) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      speechSynthesis.speak(utterance);
+    }
+  </script>
+</body>
+</html>

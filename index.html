@@ -66,6 +66,7 @@
     }
 
     function speak(text) {
+      speechSynthesis.cancel(); // これを入れると重複回避できます♪
       const utterance = new SpeechSynthesisUtterance(text);
       speechSynthesis.speak(utterance);
     }
